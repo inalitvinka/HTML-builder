@@ -6,21 +6,20 @@ const { readdir, stat } = require('node:fs/promises');
 const pathToDir = path.join(__dirname, 'secret-folder');
 fs.readdir(pathToDir, { withFileTypes: true }, (err, files) => {
   if (err) {
-    console.error(err.message);
+    console.log(err.message);
   }
   const toLog = files.filter(file => file.isFile());
   toLog.forEach(showInfo);
-  // files.forEach((file) => {
-  //   if (file.isFile()) console.log(file.name);
-  // })
 })
 
 function showInfo(file) {
   const filePath = path.join(pathToDir, file.name);
-  fs.stat(filePath, filePath, (er, stats) => {
-    if (er) {
-      console.error(er.message);
+  fs.stat(filePath, filePath, (err, stats) => {
+    if (err) {
+      console.log(err.message);
     }
-    console.log(file.name.split('.'));
+    const filesArr = file.name.split('.');
+    filesArr.push(`${(stats.size / 1024)}kB`);
+    stdout.write(`${filesArr.join(' - ')}\n`);
   })
 }
