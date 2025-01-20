@@ -14,7 +14,7 @@ fs.readdir(pathToDir, { withFileTypes: true }, (err, files) => {
 
 function showInfo(file) {
   const filePath = path.join(pathToDir, file.name);
-  fs.stat(filePath, filePath, (err, stats) => {
+  fs.stat(filePath, (err, stats) => {
     if (err) {
       console.log(err.message);
     }
