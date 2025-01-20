@@ -10,7 +10,6 @@ async function mergeStyles() {
   try {
     const allFiles = await readdir(rootDirPath, {withFileTypes: true});
     const cssfiles = allFiles.filter(file => file.isFile() && file.name.slice(-4) === requiredExtantion);
-    console.log(cssfiles);
     for (const file of cssfiles) {
       const filesContent = await readFile(path.join(rootDirPath, file.name), 'utf-8');
       await appendFile(destDirPath, filesContent);
