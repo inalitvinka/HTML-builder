@@ -1,21 +1,22 @@
-const fs = require('fs');
+// const fs = require('fs/promises');
 const path = require('path');
-const { stdout } = require('process');
-const { readdir, stat, mkdir } = require('node:fs/promises');
+const { readdir, stat, mkdir, rm, copyFile } = require('node:fs/promises');
 
 const rootDirPath = path.join(__dirname, 'files');
 const copyDirPath = path.join(__dirname, 'files-copy');
-// const copyDir = () => {
 
-// }
-const makeNewDir = () => {
-  fs.mkdir(copyDirPath, 
-    {recursive: false},
-    (err) => {
-      if (err) {
-        return console.error(err);
-      }
-      console.log('Dir is created');
-  }); 
+async function copyDir() {
+  try {
+    await rm(copyDirPath, {recursive: true, force: true});
+    await mkdir(copyDirPath, {recursive: true});
+    (await readdir(rootDirPath, {withFileTypes: false})).forEach(file => {
+      const rootFilePath = path.join(rootDirPath, file);
+      const copyFilePath = path.join(copyDirPath, file);
+      copyFile(rootFilePath, copyFilePath);
+      // copyFile(path.join(rootDirPath, file), path.join(copyDirPath, file));
+    })
+  } catch (error) {
+    console.error(error);
+  }
 }
-makeNewDir();
+copyDir();
