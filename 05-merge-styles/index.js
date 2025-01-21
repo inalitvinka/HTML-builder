@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { readdir, readFile, writeFile, appendFile, stat, mkdir } = require('node:fs/promises');
+const { readdir, readFile } = require('node:fs/promises');
 const { stdout } = require('process');
 
 const rootDirPath = path.join(__dirname, 'styles');
@@ -16,11 +16,8 @@ async function mergeStyles() {
     for (const file of cssfiles) {
       const stylesContent = await readFile(path.join(rootDirPath, file.name), 'utf-8');
       stylesToMerge.push(stylesContent);
-      // writeStream.write(`${stylesContent}\n`);
     }
     writeStream.write(`${stylesToMerge.join('\n')}\n`);
-    // await writeFile(path.join(destDirPath, 'bundle.css'), stylesToMerge.join(' '),
-    // );
     stdout.write('Bundle is created');
   } catch (error) {
     console.error(error);
