@@ -39,13 +39,13 @@ async function buildProject() {
     await mkdir(projectDistPath, {recursive: true});
 
     // createDirectory here
-    await createDirectory(assetsDirName);
+    await createDirectory(path.join(__dirname, 'assets'), path.join(projectDistPath, 'assets'), assetsDirName);
     await createStyles();
   } catch (error) {
     console.error('buildProject', error);
   }
 }
-async function createDirectory(outputDirPath) {
+async function createDirectory(sourceDirPath, outputDirPath) {
   try {
     await rm(outputDirPath, {recursive: true, force: true});
     await mkdir(outputDirPath, {recursive: true});
