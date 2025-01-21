@@ -9,32 +9,39 @@ const { readdir, readFile, writeFile, rm, copyFile, appendFile, stat, mkdir } = 
 
 const projectDistName = 'project-dist';
 const projectDistPath = path.join(__dirname, projectDistName);
-const assetsDirName = 'assets';
-
-const htmlComponentsDir = 'components'; 
-const cssSourceDir = 'styles';
 const cssDistPath = path.join(__dirname, projectDistName, 'style.css');
 
 const htmlExtantion = '.html';
 const cssExtantion = '.css';
 
+async function copyAssetsFiles(sourceDirPath, outputDirPath) {
+  const files = await readdir(sourceDirPath, {withFileTypes: true});
+  for (const file of files) {
+    if (file.isDirectory()) {
+      // const filesInsideAssetsFolder = await readdir(path.join(path.join(__dirname, 'assets'), file.name), {withFileTypes: true});
+      await mkdir(path.join(outputDirPath, file.name));
+      await copyAssetsFiles(path.join(sourceDirPath, file.name), path.join(outputDirPath, file.name));
+      // for (const item of filesInsideAssetsFolder) {
+      //   await copyFile(path.join(path.join(__dirname, 'assets'), item.name), path.join(path.join(projectDistPath, 'assets'), file.name));
+      // }
+    } else if (file.isFile()) {
+      await copyFile(path.join(sourceDirPath, file.name), path.join(outputDirPath, file.name));
+      
+    } else {
+      console.log('lol');
+    }
+  }
+}
 async function createDirectory(sourceDirPath, outputDirPath) {
+  console.log(sourceDirPath)
+  console.log(outputDirPath)
   try {
     await rm(outputDirPath, {recursive: true, force: true});
     await mkdir(outputDirPath, {recursive: true});
-    // copy files here
-    const files = await readdir(path.join(__dirname, 'assets'), {withFileTypes: true});
-    for (const file of files) {
-      if (file.isDirectory()) {
-        // console.log(path.join(__dirname, file.name));
-        const filesInsideAssetsFolder = await readdir(path.join(path.join(__dirname, 'assets'), file.name), {withFileTypes: true});
-        // console.log(path.join(path.join(projectDistPath, 'assets'), file.name))
-        await mkdir(path.join(path.join(projectDistPath, 'assets'), file.name));
-      } else {
-        console.log('lol');
-      }
-    }
-    console.log('Directory is created');
+    // copy assets files here
+    copyAssetsFiles(sourceDirPath, outputDirPath);
+    console.log('Assets directory is created');
+    console.log('Assets files are copied');
   } catch (error) {
     console.error( 'createDirectory', error);
   }
@@ -60,7 +67,7 @@ async function buildProject() {
     await mkdir(projectDistPath, {recursive: true});
 
     // createDirectory here
-    await createDirectory(path.join(__dirname, 'assets'), path.join(projectDistPath, 'assets'), assetsDirName);
+    await createDirectory(path.join(__dirname, 'assets'), path.join(projectDistPath, 'assets'));
     await createStyles();
   } catch (error) {
     console.error('buildProject', error);
