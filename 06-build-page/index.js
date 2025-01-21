@@ -18,6 +18,27 @@ const cssDistPath = path.join(__dirname, projectDistName, 'style.css');
 const htmlExtantion = '.html';
 const cssExtantion = '.css';
 
+async function createDirectory(sourceDirPath, outputDirPath) {
+  try {
+    await rm(outputDirPath, {recursive: true, force: true});
+    await mkdir(outputDirPath, {recursive: true});
+    // copy files here
+    const files = await readdir(path.join(__dirname, 'assets'), {withFileTypes: true});
+    for (const file of files) {
+      if (file.isDirectory()) {
+        // console.log(path.join(__dirname, file.name));
+        const filesInsideAssetsFolder = await readdir(path.join(path.join(__dirname, 'assets'), file.name), {withFileTypes: true});
+        // console.log(path.join(path.join(projectDistPath, 'assets'), file.name))
+        await mkdir(path.join(path.join(projectDistPath, 'assets'), file.name));
+      } else {
+        console.log('lol');
+      }
+    }
+    console.log('Directory is created');
+  } catch (error) {
+    console.error( 'createDirectory', error);
+  }
+}
 
 async function createStyles() {
   try {
@@ -43,16 +64,6 @@ async function buildProject() {
     await createStyles();
   } catch (error) {
     console.error('buildProject', error);
-  }
-}
-async function createDirectory(sourceDirPath, outputDirPath) {
-  try {
-    await rm(outputDirPath, {recursive: true, force: true});
-    await mkdir(outputDirPath, {recursive: true});
-    // copy files here
-    console.log('Directory is created');
-  } catch (error) {
-    console.error( 'createDirectory', error);
   }
 }
 buildProject();
