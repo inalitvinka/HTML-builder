@@ -10,10 +10,29 @@ const { readdir, readFile, writeFile, rm, copyFile, appendFile, stat, mkdir } = 
 const projectDistName = 'project-dist';
 const projectDistPath = path.join(__dirname, projectDistName);
 const cssDistPath = path.join(__dirname, projectDistName, 'style.css');
-
-const htmlExtantion = '.html';
 const cssExtantion = '.css';
 
+async function createHtml() {
+  try {
+    const writeStream = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'), 'utf-8');
+    const files = await readdir(path.join(__dirname, 'components'), {withFileTypes: true});
+    let htmlTemplate = await readFile(path.join(__dirname, 'template.html'),'utf-8');
+    for (const file of files) {
+      const component = await readFile(path.join(path.join(__dirname, 'components'), file.name), 'utf-8');
+      // console.log(component);
+      const componentToReplace = new RegExp(`{{${file.name.split('.').slice(0, 1).join(' ')}}}`);
+      htmlTemplate = htmlTemplate.replace(componentToReplace, component.toString());
+    }
+    // const re = /apples/gi;
+    // const str = "Apples are round, and apples are juicy.";
+    // const newstr = str.replace(re, "oranges");
+    // console.log(newstr); // oranges are round, and oranges are juicy.
+    writeStream.write(`${htmlTemplate}\n`);
+  } catch (error) {
+    console.error('createHtml', error);
+  }
+}
+// createHtml();
 async function copyAssetsFiles(sourceDirPath, outputDirPath) {
   const files = await readdir(sourceDirPath, {withFileTypes: true});
   for (const file of files) {
@@ -33,8 +52,8 @@ async function copyAssetsFiles(sourceDirPath, outputDirPath) {
   }
 }
 async function createDirectory(sourceDirPath, outputDirPath) {
-  console.log(sourceDirPath)
-  console.log(outputDirPath)
+  // console.log(sourceDirPath)
+  // console.log(outputDirPath)
   try {
     await rm(outputDirPath, {recursive: true, force: true});
     await mkdir(outputDirPath, {recursive: true});
@@ -69,6 +88,7 @@ async function buildProject() {
     // createDirectory here
     await createDirectory(path.join(__dirname, 'assets'), path.join(projectDistPath, 'assets'));
     await createStyles();
+    await createHtml();
   } catch (error) {
     console.error('buildProject', error);
   }
